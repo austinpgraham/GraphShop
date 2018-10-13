@@ -12,6 +12,10 @@ from gs.dataserver.model.product import Product
 from gs.dataserver.model.product import add_products
 from gs.dataserver.model.product import get_products
 
+from gs.dataserver.model.user import ReviewUser
+from gs.dataserver.model.user import get_reviewusers
+from gs.dataserver.model.user import add_reviewusers
+
 
 class TestModel(DatabaseTest):
 
@@ -40,3 +44,10 @@ class TestModel(DatabaseTest):
         add_products([prod1, prod2])
         prods = get_products([prod1.asin, prod2.asin])
         assert_that(prods, has_length(2))
+
+    def test_user(self):
+        ru = ReviewUser(id='1234',
+                        name='TestName')
+        add_reviewusers([ru])
+        users = get_reviewusers(['1234'])
+        assert_that(users, has_length(1))
