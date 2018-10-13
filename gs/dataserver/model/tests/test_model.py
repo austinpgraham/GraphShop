@@ -16,6 +16,10 @@ from gs.dataserver.model.user import ReviewUser
 from gs.dataserver.model.user import get_reviewusers
 from gs.dataserver.model.user import add_reviewusers
 
+from gs.dataserver.model.review import Review
+from gs.dataserver.model.review import add_reviews
+from gs.dataserver.model.review import get_reviews
+
 
 class TestModel(DatabaseTest):
 
@@ -51,3 +55,20 @@ class TestModel(DatabaseTest):
         add_reviewusers([ru])
         users = get_reviewusers(['1234'])
         assert_that(users, has_length(1))
+
+    def test_review(self):
+        prod = Product(asin='0123456748',
+                       title='testprod',
+                       price=56.7,
+                       imURL='testurl',
+                       brand='tesrbrand',
+                       related='testrelated',
+                       salesrank='testsalesrank',
+                       categories='testcat')
+        ru = ReviewUser(id='1235',
+                        name='TestName')
+        r = Review(reviewerID=ru.id,
+                   asin=prod.asin)
+        add_reviews([r])
+        reviews = get_reviews(rids=[ru.id], pids=[prod.asin])
+        assert_that(reviews, has_length(1))
