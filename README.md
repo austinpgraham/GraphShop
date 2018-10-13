@@ -20,5 +20,5 @@ setup.py develop
 
 Run unit tests:
 ```
-nose2 -v --with-coverage
+nose2 -v --with-coverage --coverate-report term-missing
 ```
