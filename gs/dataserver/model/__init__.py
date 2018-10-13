@@ -43,4 +43,10 @@ class ModelDB():
 
     @property
     def inspector(self):
-        return inspect(self._engine) # pragma: no cover
+        return inspect(self._engine)  # pragma: no cover
+
+
+def _batch(iterable, size):
+    l = len(iterable)
+    for i in range(0, l, size):
+        yield iterable[i:min(i + size, l)]
