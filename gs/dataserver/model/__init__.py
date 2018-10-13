@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 import os
+import json
 
-from sqlalchmey import create_engine
+from sqlalchemy import create_engine
+
+from sqlalchemy.orm import sessionmaker
+
 
 class ModelDB():
     """
@@ -12,13 +16,14 @@ class ModelDB():
     _CONFIG_PATH = "cfg/db.cfg"
 
     def __init__(self, **kwargs):
-        conn_str = self._read_cfg()
-        self._engine = create_engine(conn_str, connect_args=kwargs)
+        cfg = self._read_cfg()
+        self._engine = create_engine(cfg['conn_str'], connect_args=kwargs)
         self.session = sessionmaker(bind=self._engine, expire_on_commit=False)()
     
     def _read_cfg(self):
         dirname = os.path.dirname(__file__)
-        return os.path.join(dirname, self._CONFIG_PATH)
+        path = os.path.join(dirname, self._CONFIG_PATH)
+        return json.load(open(path, 'r'))
     
     def __enter__(self):
         return self
@@ -26,3 +31,6 @@ class ModelDB():
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.session.commit()
         self.close()
+    
+    def close(self):
+        self.session.close()

@@ -10,3 +10,15 @@ Create virtual environment and acitvate:
 python3 -m venv graphshop
 source graphshop/bin/actvate
 ```
+
+## Development and running unit tests:
+
+Run the following for development mode:
+```
+setup.py develop
+```
+
+Run unit tests:
+```
+nose2 -v --with-coverage
+```
