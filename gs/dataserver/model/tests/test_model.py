@@ -11,8 +11,6 @@ from gs.dataserver.model import ModelDB
 class TestModel(DatabaseTest):
 
     def test_database(self):
-        try:
-            assert_that(ModelDB(), is_not(raises(Exception)))
-        finally:
-            self.tearDown()
-
+        assert_that(ModelDB(), is_not(raises(Exception)))
+        with ModelDB() as _:
+            pass

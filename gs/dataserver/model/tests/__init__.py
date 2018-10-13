@@ -19,7 +19,7 @@ class DatabaseTest(unittest.TestCase):
     def setUp(self):
         open(self.TEST_DB, 'w').close()
         self._write_cfg()
-    
+
     def tearDown(self):
         os.remove(self.TEST_DB)
         path = os.path.join(os.path.dirname(__file__), self.CONFIG_PATH)

@@ -20,6 +20,8 @@ setup(name='gs',
           ]
       },
       install_requires=[
-          'sqlalchemy'
+          'sqlalchemy',
+          'pyhamcrest',
+          'nose2'
       ]
-)
+    )
