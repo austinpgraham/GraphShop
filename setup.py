@@ -20,5 +20,6 @@ setup(name='gs',
           ]
       },
       install_requires=[
+          'sqlalchemy'
       ]
 )
