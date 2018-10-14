@@ -17,7 +17,7 @@ setup(name='gs',
       package_dir={'': 'src'},
       entry_points={
           'console_scripts': [
-              'gs_upload_products=gs.scripts.upload_products:main'
+              'gs_upload_products=gs.dataserver.scripts.upload_products:main'
           ]
       },
       install_requires=[

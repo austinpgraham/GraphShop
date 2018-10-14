@@ -35,12 +35,17 @@ def main(args=None):
     items = []
     total = 0
     for item in parse_file(_file):
+        for key, value in item.items():
+                item[key] = str(value)
+        if 'price' in item.keys():
+                item['price'] = float(item['price'])
         p = Product(**item)
         items.append(p)
-        if len(items) > 0 and len(items) % 50:
-            add_products(items)
-            total += 50
-            logging.info('{} products uploaded.'.format(total))
+        if len(items) > 0 and len(items) % 50 == 0:
+                add_products(items)
+                total += 50
+                logging.info('{} products uploaded.'.format(total))
+                items = []
     add_products(items)
     logging.info('Done.')
 
