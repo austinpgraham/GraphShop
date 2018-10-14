@@ -15,8 +15,9 @@ setup(name='gs',
       url='https://github.com/austinpgraham/GraphShop',
       packages=find_packages('src'),
       package_dir={'': 'src'},
-      entry_points = {
+      entry_points={
           'console_scripts': [
+              'gs_upload_products=gs.dataserver.scripts.upload_products:main'
           ]
       },
       install_requires=[
@@ -24,4 +25,4 @@ setup(name='gs',
           'pyhamcrest',
           'nose2'
       ]
-    )
+)
