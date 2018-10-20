@@ -15,10 +15,10 @@ source graphshop/bin/actvate
 
 Run the following for development mode:
 ```
-setup.py develop
+python3 setup.py develop
 ```
 
 Run unit tests:
 ```
-nose2 -v --with-coverage --coverate-report term-missing
+nose2 -v --with-coverage --coverage-report term-missing
 ```

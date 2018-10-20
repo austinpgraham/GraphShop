@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import gzip
+import logging
+
+from argparse import ArgumentParser
+
+from gs.dataserver.model.product import Product
+from gs.dataserver.model.product import product_exists
+
+from gs.dataserver.model.review import Review
+from gs.dataserver.model.review import add_reviews
+from gs.dataserver.model.review import review_exists
+
+
+def parse_file(path):
+    g = gzip.open(path, 'r')
+    for line in g:
+        yield eval(line)
+
+
+def process_args(args=None):
+    parser = ArgumentParser()
+    parser.add_argument('-f', '--file', help="File containing review data")
+
+    args = parser.parse_args()
+    assert args.file is not None, "Must provide file to upload"
+    _file = os.path.expanduser(args.file)
+    assert os.path.exists(_file), "Input file not found."
+
+    return _file
+
+
+def main(args=None):
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    _file = process_args(args=args)
+    items = []
+    total = 0
+    for item in parse_file(_file):
+        for key, value in item.items():
+            item[key] = str(value)
+        r = Review(**item)
+        if not review_exists(r.reviewerID, r.asin) and product_exists(r.asin):
+            items.append(r)
+        if len(items) > 0 and len(items) % 50 == 0:
+            add_reviews(items)
+            total += 50
+            logging.info("{} reviews uploaded.".format(total))
+            items = []
+    add_reviews(items)
+    logging.info("Done.")
+
+if __name__ == '__main__':
+    main(sys.argv)

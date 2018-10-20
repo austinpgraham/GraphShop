@@ -1,4 +1,5 @@
 {
     "python.linting.enabled": true,
     "python.linting.pep8Enabled": true,
+    "python.pythonPath": "/home/pgreazy/VirtualEnvs/graphshop/bin/python3",
 }

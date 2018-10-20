@@ -50,3 +50,10 @@ def get_products(ids):
     with ModelDB() as db:
         result = db.session.query(Product).filter(Product.asin.in_(ids)).all()
     return result
+
+
+@productfunc
+def product_exists(asin):
+    with ModelDB() as db:
+        query = db.session.query(Product).filter(Product.asin == asin)
+    return db.session.query(query.exists()).all().pop()[0]
