@@ -18,7 +18,7 @@ setup(name='gs',
       entry_points={
           'console_scripts': [
               'gs_upload_products=gs.dataserver.scripts.upload_products:main',
-              'gs_upload_reviews=gs.dataserver.scripts.upload_reveiws:main'
+              'gs_upload_reviews=gs.dataserver.scripts.upload_reviews:main'
           ]
       },
       install_requires=[

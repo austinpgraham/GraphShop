@@ -8,9 +8,11 @@ import logging
 from argparse import ArgumentParser
 
 from gs.dataserver.model.product import Product
+from gs.dataserver.model.product import product_exists
 
 from gs.dataserver.model.review import Review
 from gs.dataserver.model.review import add_reviews
+from gs.dataserver.model.review import review_exists
 
 
 def parse_file(path):
@@ -40,7 +42,8 @@ def main(args=None):
         for key, value in item.items():
             item[key] = str(value)
         r = Review(**item)
-        items.append(r)
+        if not review_exists(r.reviewerID, r.asin) and product_exists(r.asin):
+            items.append(r)
         if len(items) > 0 and len(items) % 50 == 0:
             add_reviews(items)
             total += 50
