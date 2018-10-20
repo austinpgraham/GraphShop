@@ -47,7 +47,7 @@ def main(args=None):
             item[key] = str(value)
         r = Review(**item)
         if not user_exists(r.reviewerID):
-            u = ReviewUser(id=r.reviewerID, name=r.reviewerName)
+            u = ReviewUser(id=r.reviewerID, name=getattr(r, "reviewerName", ""))
             add_reviewusers([u])
             logging.info("User {} added.".format(u.name))
         if not review_exists(r.reviewerID, r.asin) and product_exists(r.asin):

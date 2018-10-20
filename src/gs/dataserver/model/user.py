@@ -7,7 +7,7 @@ from gs.dataserver.model import _batch
 from gs.dataserver.model import ModelDB
 
 
-USER_ID_LENGTH = 14
+USER_ID_LENGTH = 40
 
 
 class ReviewUser(Base):
