@@ -12,7 +12,7 @@ USER_ID_LENGTH = 14
 
 class ReviewUser(Base):
 
-    __tablename__ = "user"
+    __tablename__ = "reviewuser"
 
     id = Column(String(USER_ID_LENGTH), primary_key=True, unique=True)
     name = Column(String)
@@ -25,7 +25,7 @@ class ReviewUser(Base):
 def reviewuserfunc(func, *args, **kwargs):
     def wrapper(*args, **kwargs):
         with ModelDB() as db:
-            if "user" not in db.inspector.get_table_names():
+            if "reviewuser" not in db.inspector.get_table_names():
                 Base.metadata.create_all(db._engine)
         return func(*args, **kwargs)
     return wrapper
@@ -49,4 +49,5 @@ def get_reviewusers(ids):
 def user_exists(user):
     with ModelDB() as db:
         query = db.session.query(ReviewUser).filter(ReviewUser.id == user)
-    return db.session.query(query.exists()).all().pop()[0]
+        ans = db.session.query(query.exists()).all().pop()[0]
+    return ans

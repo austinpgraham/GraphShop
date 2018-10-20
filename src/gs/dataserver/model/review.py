@@ -20,7 +20,7 @@ class Review(Base):
 
     __tablename__ = 'review'
 
-    reviewerID = Column(String(USER_ID_LENGTH), ForeignKey("user.id"), primary_key=True)
+    reviewerID = Column(String(USER_ID_LENGTH), ForeignKey("reviewuser.id"), primary_key=True)
     asin = Column(String(PRODUCT_ID_LENGTH), ForeignKey("product.asin"), primary_key=True)
     helpful = Column(String)
     text = Column(String)
@@ -64,4 +64,5 @@ def get_reviews(rids=None, pids=None):
 def review_exists(rid, pid):
     with ModelDB() as db:
         query = db.session.query(Review).filter(Review.reviewerID == rid).filter(Review.asin == pid)
-    return db.session.query(query.exists()).all().pop()[0]
+        ans = db.session.query(query.exists()).all().pop()[0]
+    return ans
