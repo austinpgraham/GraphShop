@@ -34,8 +34,20 @@ def process_args(args=None):
 def main(args=None):
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     _file = process_args(args=args)
-
-
+    items = []
+    total = 0
+    for item in parse_file(_file):
+        for key, value in item.items():
+            item[key] = str(value)
+        r = Review(**item)
+        items.append(r)
+        if len(items) > 0 and len(items) % 50 == 0:
+            add_reviews(items)
+            total += 50
+            logging.info("{} reviews uploaded.".format(total))
+            items = []
+    add_reviews(items)
+    logging.info("Done.")
 
 if __name__ == '__main__':
     main(sys.argv)

@@ -21,6 +21,7 @@ from gs.dataserver.model.user import add_reviewusers
 from gs.dataserver.model.review import Review
 from gs.dataserver.model.review import add_reviews
 from gs.dataserver.model.review import get_reviews
+from gs.dataserver.model.review import review_exists
 
 
 class TestModel(DatabaseTest):
@@ -62,6 +63,8 @@ class TestModel(DatabaseTest):
         assert_that(users, has_length(1))
 
     def test_review(self):
+        exists = review_exists('1235', '0123456748')
+        assert_that(exists, is_(False))
         prod = Product(asin='0123456748',
                        title='testprod',
                        price=56.7,
@@ -77,3 +80,5 @@ class TestModel(DatabaseTest):
         add_reviews([r])
         reviews = get_reviews(rids=[ru.id], pids=[prod.asin])
         assert_that(reviews, has_length(1))
+        exists = review_exists('1235', '0123456748')
+        assert_that(exists, is_(True))

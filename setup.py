@@ -24,6 +24,7 @@ setup(name='gs',
       install_requires=[
           'sqlalchemy',
           'pyhamcrest',
-          'nose2'
+          'nose2',
+          'psycopg2'
       ]
 )

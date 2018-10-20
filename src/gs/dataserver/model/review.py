@@ -58,3 +58,10 @@ def get_reviews(rids=None, pids=None):
         if pids is not None:
             query = query.filter(Review.asin.in_(pids))
     return query.all()
+
+
+@reviewfunc
+def review_exists(rid, pid):
+    with ModelDB() as db:
+        query = db.session.query(Review).filter(Review.reviewerID == rid).filter(Review.asin == pid)
+    return db.session.query(query.exists()).all().pop()[0]
