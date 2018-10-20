@@ -8,7 +8,9 @@ import logging
 from argparse import ArgumentParser
 
 from gs.dataserver.model.product import Product
-from gs.dataserver.model.product import add_products
+
+from gs.dataserver.model.review import Review
+from gs.dataserver.model.review import add_reviews
 
 
 def parse_file(path):
@@ -32,6 +34,7 @@ def process_args(args=None):
 def main(args=None):
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     _file = process_args(args=args)
+
 
 
 if __name__ == '__main__':

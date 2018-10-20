@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from hamcrest import is_
 from hamcrest import raises
 from hamcrest import is_not
 from hamcrest import has_length
@@ -11,6 +12,7 @@ from gs.dataserver.model import ModelDB
 from gs.dataserver.model.product import Product
 from gs.dataserver.model.product import add_products
 from gs.dataserver.model.product import get_products
+from gs.dataserver.model.product import product_exists
 
 from gs.dataserver.model.user import ReviewUser
 from gs.dataserver.model.user import get_reviewusers
@@ -29,6 +31,8 @@ class TestModel(DatabaseTest):
             pass
 
     def test_product(self):
+        exists = product_exists('0123456789')
+        assert_that(exists, is_(False))
         prod1 = Product(asin='0123456789',
                         title='testprod',
                         price=56.7,
@@ -48,6 +52,7 @@ class TestModel(DatabaseTest):
         add_products([prod1, prod2])
         prods = get_products([prod1.asin, prod2.asin])
         assert_that(prods, has_length(2))
+        assert_that(product_exists('0123456789'), is_(True))
 
     def test_user(self):
         ru = ReviewUser(id='1234',
