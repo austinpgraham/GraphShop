@@ -14,6 +14,10 @@ from gs.dataserver.model.review import Review
 from gs.dataserver.model.review import add_reviews
 from gs.dataserver.model.review import review_exists
 
+from gs.dataserver.model.user import ReviewUser
+from gs.dataserver.model.user import user_exists
+from gs.dataserver.model.user import add_reviewusers
+
 
 def parse_file(path):
     g = gzip.open(path, 'r')
@@ -42,6 +46,10 @@ def main(args=None):
         for key, value in item.items():
             item[key] = str(value)
         r = Review(**item)
+        if not user_exists(r.reviewerID):
+            u = ReviewUser(id=r.reviewerID, name=r.reviewerName)
+            add_reviewusers([u])
+            logging.info("User {} added.".format(u.name))
         if not review_exists(r.reviewerID, r.asin) and product_exists(r.asin):
             items.append(r)
         if len(items) > 0 and len(items) % 50 == 0:
