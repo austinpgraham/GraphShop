@@ -15,6 +15,7 @@ from gs.dataserver.model.product import get_products
 from gs.dataserver.model.product import product_exists
 
 from gs.dataserver.model.user import ReviewUser
+from gs.dataserver.model.user import user_exists
 from gs.dataserver.model.user import get_reviewusers
 from gs.dataserver.model.user import add_reviewusers
 
@@ -56,11 +57,15 @@ class TestModel(DatabaseTest):
         assert_that(product_exists('0123456789'), is_(True))
 
     def test_user(self):
+        exists = user_exists('1234')
+        assert_that(exists, is_(False))
         ru = ReviewUser(id='1234',
                         name='TestName')
         add_reviewusers([ru])
         users = get_reviewusers(['1234'])
         assert_that(users, has_length(1))
+        exists = user_exists('1234')
+        assert_that(exists, is_(True))
 
     def test_review(self):
         exists = review_exists('1235', '0123456748')

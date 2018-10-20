@@ -43,3 +43,10 @@ def get_reviewusers(ids):
     with ModelDB() as db:
         result = db.session.query(ReviewUser).filter(ReviewUser.id.in_(ids)).all()
     return result
+
+
+@reviewuserfunc
+def user_exists(user):
+    with ModelDB() as db:
+        query = db.session.query(ReviewUser).filter(ReviewUser.id == user)
+    return db.session.query(query.exists()).all().pop()[0]
