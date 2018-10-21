@@ -13,6 +13,7 @@ from gs.dataserver.model.product import Product
 from gs.dataserver.model.product import add_products
 from gs.dataserver.model.product import get_products
 from gs.dataserver.model.product import product_exists
+from gs.dataserver.model.product import search_products
 
 from gs.dataserver.model.user import ReviewUser
 from gs.dataserver.model.user import user_exists
@@ -36,7 +37,7 @@ class TestModel(DatabaseTest):
         exists = product_exists('0123456789')
         assert_that(exists, is_(False))
         prod1 = Product(asin='0123456789',
-                        title='testprod',
+                        title='testbleh',
                         price=56.7,
                         imURL='testurl',
                         brand='tesrbrand',
@@ -55,6 +56,13 @@ class TestModel(DatabaseTest):
         prods = get_products([prod1.asin, prod2.asin])
         assert_that(prods, has_length(2))
         assert_that(product_exists('0123456789'), is_(True))
+
+        # Test search
+        result = search_products("%prod%")
+        assert_that(result, has_length(1))
+
+        result = search_products("%test%")
+        assert_that(result, has_length(2))
 
     def test_user(self):
         exists = user_exists('1234')

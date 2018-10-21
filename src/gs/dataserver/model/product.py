@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 
+from sqlalchemy import or_
 from sqlalchemy import Float
 from sqlalchemy import String
 from sqlalchemy import Column
@@ -73,3 +74,11 @@ def product_exists(asin):
         query = db.session.query(Product).filter(Product.asin == asin)
         ans = db.session.query(query.exists()).all().pop()[0]
     return ans
+
+
+@productfunc
+def search_products(query_str):
+    with ModelDB() as db:
+        query = db.session.query(Product).filter(or_(Product.title.like(query_str), Product.brand.like(query_str)))
+        result = query.all()
+    return result

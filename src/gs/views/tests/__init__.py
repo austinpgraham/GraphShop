@@ -22,10 +22,10 @@ class WebTest(unittest.TestCase):
 
     def _add_products(self):
         prod1 = Product(asin='0123456748',
-                        title='testprod',
+                        title='testbleh',
                         price=56.7,
                         imURL='testurl',
-                        brand='tesrbrand',
+                        brand='testbrand',
                         related='["testrelated"]',
                         salesrank='["testsalesrank"]',
                         categories='["testcat"]')
@@ -33,7 +33,7 @@ class WebTest(unittest.TestCase):
                         title='testprod',
                         price=56.7,
                         imURL='testurl',
-                        brand='tesrbrand',
+                        brand='testbrand',
                         related='["testrelated"]',
                         salesrank='["testsalesrank"]',
                         categories='["testcat"]')
