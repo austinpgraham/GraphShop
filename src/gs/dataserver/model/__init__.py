@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import json
 
 from sqlalchemy import inspect
@@ -27,9 +26,7 @@ class ModelDB():
         self.session = sessionmaker(bind=self._engine, expire_on_commit=False)()
 
     def _read_cfg(self):
-        dirname = os.path.dirname(__file__)
-        path = os.path.join(dirname, self._CONFIG_PATH)
-        return json.load(open(path, 'r'))
+        return json.load(open(self._CONFIG_PATH, 'r'))
 
     def __enter__(self):
         return self

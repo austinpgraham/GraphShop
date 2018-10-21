@@ -7,10 +7,10 @@ import unittest
 class DatabaseTest(unittest.TestCase):
 
     TEST_DB = "test.db"
-    CONFIG_PATH = "../cfg/db.cfg"
+    CONFIG_PATH = "cfg/db.cfg"
 
     def _write_cfg(self):
-        path = os.path.join(os.path.dirname(__file__), self.CONFIG_PATH)
+        path = self.CONFIG_PATH
         args = {
             "conn_str": "sqlite:///{}".format(self.TEST_DB)
         }
@@ -22,5 +22,5 @@ class DatabaseTest(unittest.TestCase):
 
     def tearDown(self):
         os.remove(self.TEST_DB)
-        path = os.path.join(os.path.dirname(__file__), self.CONFIG_PATH)
+        path = self.CONFIG_PATH
         os.remove(path)

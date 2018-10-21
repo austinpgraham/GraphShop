@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 
-from gs.views import base_app
+from gs.views import application
 
 
 def process_args(args=None):
@@ -18,7 +18,7 @@ def process_args(args=None):
 
 def main(args=None):
     host, port, debug = process_args(args)
-    base_app.run(host=host, port=port, threaded=True, debug=debug)
+    application.run(host=host, port=port, threaded=True, debug=debug)
 
 if __name__ == '__main__':
     main()

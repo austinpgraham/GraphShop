@@ -26,6 +26,7 @@ setup(name='gs',
           'sqlalchemy',
           'pyhamcrest',
           'nose2',
-          'psycopg2'
+          'psycopg2',
+          'flask'
       ]
 )
