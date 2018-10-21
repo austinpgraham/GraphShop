@@ -40,6 +40,7 @@ class Product(Base):
     def convert_json(self):
         for att in self._JSON_ATTS:
             val = getattr(self, att, "[]") or "[]"
+            val = val.replace("'", '"')
             setattr(self, att, json.loads(val))
 
 
