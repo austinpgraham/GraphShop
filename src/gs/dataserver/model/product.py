@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import json
+
+from sqlalchemy import or_
 from sqlalchemy import Float
 from sqlalchemy import String
 from sqlalchemy import Column
@@ -24,9 +27,21 @@ class Product(Base):
     salesRank = Column(String)
     categories = Column(String)
 
+    _JSON_ATTS = [
+        "related",
+        "salesRank",
+        "categories"
+    ]
+
     def __init__(self, *args, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def convert_json(self):
+        for att in self._JSON_ATTS:
+            val = getattr(self, att, "[]") or "[]"
+            val = val.replace("'", '"')
+            setattr(self, att, json.loads(val))
 
 
 def productfunc(func, *args, **kwargs):
@@ -49,6 +64,8 @@ def add_products(objs, batch_size=50):
 def get_products(ids):
     with ModelDB() as db:
         result = db.session.query(Product).filter(Product.asin.in_(ids)).all()
+    for r in result:
+        r.convert_json()
     return result
 
 
@@ -58,3 +75,11 @@ def product_exists(asin):
         query = db.session.query(Product).filter(Product.asin == asin)
         ans = db.session.query(query.exists()).all().pop()[0]
     return ans
+
+
+@productfunc
+def search_products(query_str):
+    with ModelDB() as db:
+        query = db.session.query(Product).filter(or_(Product.title.like(query_str), Product.brand.like(query_str)))
+        result = query.all()
+    return result

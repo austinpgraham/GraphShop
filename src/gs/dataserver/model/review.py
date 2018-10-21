@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import json
+
 from sqlalchemy import Float
 from sqlalchemy import Column
 from sqlalchemy import String
@@ -28,9 +30,18 @@ class Review(Base):
     summary = Column(String)
     time = Column(Integer)
 
+    _JSON_ATTS = [
+        "helpful"
+    ]
+
     def __init__(self, *args, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
+    
+    def convert_json(self):
+        for att in self._JSON_ATTS:
+            val = getattr(self, att, "[]") or "[]"
+            setattr(self, att, json.loads(val))
 
 
 def reviewfunc(func, *args, **kwargs):
@@ -57,7 +68,10 @@ def get_reviews(rids=None, pids=None):
             query = query.filter(Review.reviewerID.in_(rids))
         if pids is not None:
             query = query.filter(Review.asin.in_(pids))
-    return query.all()
+        result = query.all()
+    for r in result:
+        r.convert_json()
+    return result
 
 
 @reviewfunc
