@@ -3,5 +3,5 @@ from flask import Flask
 
 from gs.views.product import register_products
 
-base_app = Flask(__name__)
-register_products(base_app)
+application = Flask(__name__)
+register_products(application)
