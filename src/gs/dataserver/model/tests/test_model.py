@@ -40,17 +40,17 @@ class TestModel(DatabaseTest):
                         price=56.7,
                         imURL='testurl',
                         brand='tesrbrand',
-                        related='testrelated',
-                        salesrank='testsalesrank',
-                        categories='testcat')
+                        related='["testrelated"]',
+                        salesrank='["testsalesrank"]',
+                        categories='["testcat"]')
         prod2 = Product(asin='0123456788',
                         title='testprod',
                         price=56.7,
                         imURL='testurl',
                         brand='tesrbrand',
-                        related='testrelated',
-                        salesrank='testsalesrank',
-                        categories='testcat')
+                        related='["testrelated"]',
+                        salesrank='["testsalesrank"]',
+                        categories='["testcat"]')
         add_products([prod1, prod2])
         prods = get_products([prod1.asin, prod2.asin])
         assert_that(prods, has_length(2))
@@ -75,9 +75,9 @@ class TestModel(DatabaseTest):
                        price=56.7,
                        imURL='testurl',
                        brand='tesrbrand',
-                       related='testrelated',
-                       salesrank='testsalesrank',
-                       categories='testcat')
+                       related='["testrelated"]',
+                       salesrank='{testsalesrank: 5}',
+                       categories='["testcat"]')
         ru = ReviewUser(id='1235',
                         name='TestName')
         r = Review(reviewerID=ru.id,
