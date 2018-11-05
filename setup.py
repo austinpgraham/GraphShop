@@ -19,7 +19,8 @@ setup(name='gs',
           'console_scripts': [
               'gs_upload_products=gs.dataserver.scripts.upload_products:main',
               'gs_upload_reviews=gs.dataserver.scripts.upload_reviews:main',
-              'gs_up=gs.dataserver.scripts.gsup:main'
+              'gs_up=gs.dataserver.scripts.gsup:main',
+              'gs_filter=gs.dataserver.scripts.filter:main'
           ]
       },
       install_requires=[

@@ -10,6 +10,7 @@ from gs.dataserver.model.tests import DatabaseTest
 from gs.dataserver.model import ModelDB
 
 from gs.dataserver.model.product import Product
+from gs.dataserver.model.product import get_all_ids
 from gs.dataserver.model.product import add_products
 from gs.dataserver.model.product import get_products
 from gs.dataserver.model.product import product_exists
@@ -63,6 +64,10 @@ class TestModel(DatabaseTest):
 
         result = search_products("%test%")
         assert_that(result, has_length(2))
+
+        # Test get all ids
+        ids = get_all_ids()
+        assert_that(ids, has_length(2))
 
     def test_user(self):
         exists = user_exists('1234')

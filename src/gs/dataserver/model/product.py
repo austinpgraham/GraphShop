@@ -83,3 +83,11 @@ def search_products(query_str):
         query = db.session.query(Product).filter(or_(Product.title.like(query_str), Product.brand.like(query_str)))
         result = query.all()
     return result
+
+
+@productfunc
+def get_all_ids():
+    with ModelDB() as db:
+        query = db.session.query(Product.asin)
+        result = query.all()
+    return [r[0] for r in result]

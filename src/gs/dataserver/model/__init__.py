@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import json
 
 from sqlalchemy import inspect
@@ -18,7 +19,7 @@ class ModelDB():
     to the relational DB
     """
 
-    _CONFIG_PATH = "cfg/db.cfg"
+    _CONFIG_PATH = os.path.dirname(__file__) + "/cfg/db.cfg"
 
     def __init__(self, **kwargs):
         cfg = self._read_cfg()
