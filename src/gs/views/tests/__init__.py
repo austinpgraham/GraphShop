@@ -59,7 +59,7 @@ class WebTest(unittest.TestCase):
         self._write_cfg()
         self._add_products()
         self._add_reviews()
-        self.app = base_app.test_client()
+        self.app = application.test_client()
 
     def tearDown(self):
         os.remove(self.TEST_DB)

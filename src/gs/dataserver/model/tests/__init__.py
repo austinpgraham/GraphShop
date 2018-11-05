@@ -7,14 +7,15 @@ import unittest
 class DatabaseTest(unittest.TestCase):
 
     TEST_DB = "test.db"
-    CONFIG_PATH = "cfg/db.cfg"
+    CONFIG_PATH = os.path.dirname(__file__) + "/../cfg/db.cfg"
 
     def _write_cfg(self):
         path = self.CONFIG_PATH
         args = {
             "conn_str": "sqlite:///{}".format(self.TEST_DB)
         }
-        json.dump(args, open(path, 'w'))
+        with open(path, 'w') as _file:
+            json.dump(args, _file)
 
     def setUp(self):
         open(self.TEST_DB, 'w').close()
