@@ -4,6 +4,7 @@ from hamcrest import raises
 from hamcrest import is_not
 from hamcrest import has_length
 from hamcrest import assert_that
+from hamcrest import has_property
 
 from gs.dataserver.model.tests import DatabaseTest
 
@@ -15,6 +16,7 @@ from gs.dataserver.model.product import add_products
 from gs.dataserver.model.product import get_products
 from gs.dataserver.model.product import product_exists
 from gs.dataserver.model.product import search_products
+from gs.dataserver.model.product import update_product
 
 from gs.dataserver.model.user import ReviewUser
 from gs.dataserver.model.user import user_exists
@@ -68,6 +70,12 @@ class TestModel(DatabaseTest):
         # Test get all ids
         ids = get_all_ids()
         assert_that(ids, has_length(2))
+
+        # Test update
+        newval = ["sometestrelated"]
+        update_product('0123456789', 'related', newval)
+        prod = get_products(['0123456789']).pop()
+        assert_that(prod, has_property('related', ["sometestrelated"]))
 
     def test_user(self):
         exists = user_exists('1234')

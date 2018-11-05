@@ -82,6 +82,8 @@ def search_products(query_str):
     with ModelDB() as db:
         query = db.session.query(Product).filter(or_(Product.title.like(query_str), Product.brand.like(query_str)))
         result = query.all()
+    for _, val in enumerate(result):
+        val.convert_json()
     return result
 
 
@@ -91,3 +93,10 @@ def get_all_ids():
         query = db.session.query(Product.asin)
         result = query.all()
     return [r[0] for r in result]
+
+
+@productfunc
+def update_product(asin, key, value):
+    with ModelDB() as db:
+        db.session.query(Product).filter(Product.asin == asin).\
+            update({key: json.dumps(value)})
