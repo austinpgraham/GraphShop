@@ -51,3 +51,11 @@ def user_exists(user):
         query = db.session.query(ReviewUser).filter(ReviewUser.id == user)
         ans = db.session.query(query.exists()).all().pop()[0]
     return ans
+
+
+@reviewuserfunc
+def get_user_set(count):
+    with ModelDB() as db:
+        query = db.session.query(ReviewUser.id).limit(count)
+        result = query.all()
+    return [r[0] for r in result]

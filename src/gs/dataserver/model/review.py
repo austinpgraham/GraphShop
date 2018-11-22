@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import json
+import logging
+import operator
+import numpy as np
 
 from sqlalchemy import Float
 from sqlalchemy import Column
@@ -15,7 +18,10 @@ from gs.dataserver.model.product import Product
 from gs.dataserver.model.product import PRODUCT_ID_LENGTH
 
 from gs.dataserver.model.user import ReviewUser
+from gs.dataserver.model.user import get_user_set
 from gs.dataserver.model.user import USER_ID_LENGTH
+
+from gs.dataserver.algorithms import GraphSVD
 
 
 class Review(Base):
@@ -118,3 +124,29 @@ def get_recommendations(uids=None):
             query = query.filter(Recommendation.userID.in_(uids))
         result = query.all()
     return result
+
+
+REC_LIMIT = 10000
+
+def compute_recommendations():
+    logging.info('Collecting data...')
+    users = get_user_set(REC_LIMIT)
+    reviews = get_reviews(rids=users)
+    pids = list(set([r.asin for r in reviews]))
+    mat = []
+    logging.info('Building matrix...')
+    for u in users:
+        mat.append([0 for _ in range(len(pids))])
+        user_reviews = [r for r in reviews if r.reviewerID == u]
+        for r in user_reviews:
+            idx = pids.index(r.asin)
+            mat[-1][idx] = r.overall / 5.0
+    logging.info('Computing SVD...')
+    recommender = GraphSVD(np.array(mat), components=40, epsilon=1e-6)
+    logging.info('Uploading recommendations...')
+    for idx, u in enumerate(users):
+        recommended = sorted(zip(pids, recommender.predictions[idx]), key=operator.itemgetter(1), reverse=True)
+        recommeded = recommended[:5]
+        items = [Recommendation(userID=u, asin=r[0], estimated_rating=r[1]) for r in recommended]
+        logging.info('Uploading recommendations for user {}...'.format(u))
+        add_recommendations(items)
