@@ -44,6 +44,19 @@ class Review(Base):
             setattr(self, att, json.loads(val))
 
 
+class Recommendation(Base):
+
+    __tablename__ = "recommendation"
+
+    userID = Column(String(USER_ID_LENGTH), ForeignKey("reviewuser.id"), primary_key=True)
+    asin = Column(String(PRODUCT_ID_LENGTH), ForeignKey("product.asin"), primary_key=True)
+    estimated_rating = Column(Float)
+
+    def __init__(self, *args, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
 def reviewfunc(func, *args, **kwargs):
     def wrapper(*args, **kwargs):
         with ModelDB() as db:
@@ -52,6 +65,14 @@ def reviewfunc(func, *args, **kwargs):
         return func(*args, **kwargs)
     return wrapper
 
+
+def recommendationfunc(func, *args, **kwargs):
+    def wrapper(*args, **kwargs):
+        with ModelDB() as db:
+            if "recommendation" not in db.inspector.get_table_names():
+                Base.metadata.create_all(db._engine)
+        return func(*args, **kwargs)
+    return wrapper
 
 @reviewfunc
 def add_reviews(objs, batch_size=50):
@@ -80,3 +101,20 @@ def review_exists(rid, pid):
         query = db.session.query(Review).filter(Review.reviewerID == rid).filter(Review.asin == pid)
         ans = db.session.query(query.exists()).all().pop()[0]
     return ans
+
+
+@recommendationfunc
+def add_recommendations(objs, batch_size=50):
+    with ModelDB() as db:
+        for b in _batch(objs, batch_size):
+            db.session.bulk_save_objects(b)
+
+
+@recommendationfunc
+def get_recommendations(uids=None):
+    with ModelDB() as db:
+        query = db.session.query(Recommendation)
+        if uids is not None:
+            query = query.filter(Recommendation.userID.in_(uids))
+        result = query.all()
+    return result
