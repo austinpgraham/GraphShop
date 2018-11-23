@@ -13,7 +13,7 @@ def process_args(args=None):
 def main(args=None):
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logging.info('Beginning recommendation compute...')
-    compute_recommendations()
+    compute_recommendations(components=40)
     logging.info('Done.')
 
 

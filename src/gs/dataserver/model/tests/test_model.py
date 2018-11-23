@@ -20,6 +20,7 @@ from gs.dataserver.model.product import update_product
 
 from gs.dataserver.model.user import ReviewUser
 from gs.dataserver.model.user import user_exists
+from gs.dataserver.model.user import get_user_set
 from gs.dataserver.model.user import get_reviewusers
 from gs.dataserver.model.user import add_reviewusers
 
@@ -31,6 +32,7 @@ from gs.dataserver.model.review import review_exists
 from gs.dataserver.model.review import Recommendation
 from gs.dataserver.model.review import add_recommendations
 from gs.dataserver.model.review import get_recommendations
+from gs.dataserver.model.review import compute_recommendations
 
 
 class TestModel(DatabaseTest):
@@ -92,6 +94,9 @@ class TestModel(DatabaseTest):
         exists = user_exists('1234')
         assert_that(exists, is_(True))
 
+        users = get_user_set(5)
+        assert_that(users, has_length(1))
+
     def test_review(self):
         exists = review_exists('1235', '0123456748')
         assert_that(exists, is_(False))
@@ -122,9 +127,26 @@ class TestModel(DatabaseTest):
                        related='["testrelated"]',
                        salesrank='{testsalesrank: 5}',
                        categories='["testcat"]')
+        prod1 = Product(asin='0123456749',
+                       title='testprod',
+                       price=56.7,
+                       imURL='testurl',
+                       brand='tesrbrand',
+                       related='["testrelated"]',
+                       salesrank='{testsalesrank: 5}',
+                       categories='["testcat"]')
+        add_products([prod, prod1])
         ru = ReviewUser(id='1235',
                         name='TestName')
-        rec = Recommendation(userID='1235', asin='0123456748', estimated_rating=4.0)
-        add_recommendations([rec])
+        r = Review(reviewerID=ru.id,
+                   asin=prod.asin,
+                   overall=4.3)
+        r1 = Review(reviewerID=ru.id,
+                   asin=prod1.asin,
+                   overall=3.2)
+        add_reviewusers([ru])
+        add_reviews([r, r1])
+
+        compute_recommendations(components=2)
         recs = get_recommendations(['1235'])
-        assert_that(recs, has_length(1))
+        assert_that(recs, has_length(2))

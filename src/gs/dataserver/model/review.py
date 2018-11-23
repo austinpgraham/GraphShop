@@ -75,7 +75,7 @@ def reviewfunc(func, *args, **kwargs):
 def recommendationfunc(func, *args, **kwargs):
     def wrapper(*args, **kwargs):
         with ModelDB() as db:
-            if "recommendation" not in db.inspector.get_table_names():
+            if "recommendation" not in db.inspector.get_table_names(): # pragma: no cover
                 Base.metadata.create_all(db._engine)
         return func(*args, **kwargs)
     return wrapper
@@ -128,7 +128,7 @@ def get_recommendations(uids=None):
 
 REC_LIMIT = 10000
 
-def compute_recommendations():
+def compute_recommendations(components=3):
     logging.info('Collecting data...')
     users = get_user_set(REC_LIMIT)
     reviews = get_reviews(rids=users)
@@ -142,7 +142,7 @@ def compute_recommendations():
             idx = pids.index(r.asin)
             mat[-1][idx] = r.overall / 5.0
     logging.info('Computing SVD...')
-    recommender = GraphSVD(np.array(mat), components=40, epsilon=1e-6)
+    recommender = GraphSVD(np.array(mat), components=components, epsilon=1e-6)
     logging.info('Uploading recommendations...')
     for idx, u in enumerate(users):
         recommended = sorted(zip(pids, recommender.predictions[idx]), key=operator.itemgetter(1), reverse=True)
