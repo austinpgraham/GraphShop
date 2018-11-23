@@ -20,7 +20,8 @@ setup(name='gs',
               'gs_upload_products=gs.dataserver.scripts.upload_products:main',
               'gs_upload_reviews=gs.dataserver.scripts.upload_reviews:main',
               'gs_up=gs.dataserver.scripts.gsup:main',
-              'gs_filter=gs.dataserver.scripts.filter:main'
+              'gs_filter=gs.dataserver.scripts.filter:main',
+              'gs_cr=gs.dataserver.scripts.recs:main'
           ]
       },
       install_requires=[
@@ -28,6 +29,7 @@ setup(name='gs',
           'pyhamcrest',
           'nose2',
           'psycopg2',
-          'flask'
+          'flask',
+          'flask_cors'
       ]
 )

@@ -43,7 +43,7 @@ class Product(Base):
             val = val.replace("'", '"')
             try:
                 setattr(self, att, json.loads(val))
-            except:
+            except: # pragma: no cover
                 self.att = []
 
 

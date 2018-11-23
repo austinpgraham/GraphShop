@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 import json
+import logging
+import operator
+import numpy as np
 
 from sqlalchemy import Float
 from sqlalchemy import Column
@@ -15,7 +18,10 @@ from gs.dataserver.model.product import Product
 from gs.dataserver.model.product import PRODUCT_ID_LENGTH
 
 from gs.dataserver.model.user import ReviewUser
+from gs.dataserver.model.user import get_user_set
 from gs.dataserver.model.user import USER_ID_LENGTH
+
+from gs.dataserver.algorithms import GraphSVD
 
 
 class Review(Base):
@@ -44,6 +50,19 @@ class Review(Base):
             setattr(self, att, json.loads(val))
 
 
+class Recommendation(Base):
+
+    __tablename__ = "recommendation"
+
+    userID = Column(String(USER_ID_LENGTH), ForeignKey("reviewuser.id"), primary_key=True)
+    asin = Column(String(PRODUCT_ID_LENGTH), ForeignKey("product.asin"), primary_key=True)
+    estimated_rating = Column(Float)
+
+    def __init__(self, *args, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+
 def reviewfunc(func, *args, **kwargs):
     def wrapper(*args, **kwargs):
         with ModelDB() as db:
@@ -52,6 +71,14 @@ def reviewfunc(func, *args, **kwargs):
         return func(*args, **kwargs)
     return wrapper
 
+
+def recommendationfunc(func, *args, **kwargs):
+    def wrapper(*args, **kwargs):
+        with ModelDB() as db:
+            if "recommendation" not in db.inspector.get_table_names(): # pragma: no cover
+                Base.metadata.create_all(db._engine)
+        return func(*args, **kwargs)
+    return wrapper
 
 @reviewfunc
 def add_reviews(objs, batch_size=50):
@@ -80,3 +107,46 @@ def review_exists(rid, pid):
         query = db.session.query(Review).filter(Review.reviewerID == rid).filter(Review.asin == pid)
         ans = db.session.query(query.exists()).all().pop()[0]
     return ans
+
+
+@recommendationfunc
+def add_recommendations(objs, batch_size=50):
+    with ModelDB() as db:
+        for b in _batch(objs, batch_size):
+            db.session.bulk_save_objects(b)
+
+
+@recommendationfunc
+def get_recommendations(uids=None):
+    with ModelDB() as db:
+        query = db.session.query(Recommendation)
+        if uids is not None:
+            query = query.filter(Recommendation.userID.in_(uids))
+        result = query.all()
+    return result
+
+
+REC_LIMIT = 10000
+
+def compute_recommendations(components=3):
+    logging.info('Collecting data...')
+    users = get_user_set(REC_LIMIT)
+    reviews = get_reviews(rids=users)
+    pids = list(set([r.asin for r in reviews]))
+    mat = []
+    logging.info('Building matrix...')
+    for u in users:
+        mat.append([0 for _ in range(len(pids))])
+        user_reviews = [r for r in reviews if r.reviewerID == u]
+        for r in user_reviews:
+            idx = pids.index(r.asin)
+            mat[-1][idx] = r.overall / 5.0
+    logging.info('Computing SVD...')
+    recommender = GraphSVD(np.array(mat), components=components, epsilon=1e-6)
+    logging.info('Uploading recommendations...')
+    for idx, u in enumerate(users):
+        recommended = sorted(zip(pids, recommender.predictions[idx]), key=operator.itemgetter(1), reverse=True)
+        recommeded = recommended[:5]
+        items = [Recommendation(userID=u, asin=r[0], estimated_rating=r[1]) for r in recommended]
+        logging.info('Uploading recommendations for user {}...'.format(u))
+        add_recommendations(items)

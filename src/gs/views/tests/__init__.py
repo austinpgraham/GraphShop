@@ -9,6 +9,9 @@ from gs.dataserver.model.product import add_products
 from gs.dataserver.model.review import Review
 from gs.dataserver.model.review import add_reviews
 
+from gs.dataserver.model.review import Recommendation
+from gs.dataserver.model.review import add_recommendations
+
 from gs.dataserver.model.user import ReviewUser
 from gs.dataserver.model.user import add_reviewusers
 
@@ -46,6 +49,10 @@ class WebTest(unittest.TestCase):
                    asin='0123456788')
         add_reviewusers([ru])
         add_reviews([r])
+        r = Recommendation(asin='0123456788',
+                           userID=ru.id,
+                           overall=4.5)
+        add_recommendations([r])
 
     def _write_cfg(self):
         path = os.path.join(os.path.dirname(__file__), self.CONFIG_PATH)
