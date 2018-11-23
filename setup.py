@@ -30,6 +30,8 @@ setup(name='gs',
           'nose2',
           'psycopg2',
           'flask',
-          'flask_cors'
-      ]
+          'flask_cors',
+          'numpy'
+      ],
+      include_package_data=True
 )

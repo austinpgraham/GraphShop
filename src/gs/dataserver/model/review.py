@@ -146,7 +146,7 @@ def compute_recommendations(components=3):
     logging.info('Uploading recommendations...')
     for idx, u in enumerate(users):
         recommended = sorted(zip(pids, recommender.predictions[idx]), key=operator.itemgetter(1), reverse=True)
-        recommeded = recommended[:5]
+        recommended = recommended[:5]
         items = [Recommendation(userID=u, asin=r[0], estimated_rating=r[1]) for r in recommended]
         logging.info('Uploading recommendations for user {}...'.format(u))
         add_recommendations(items)
