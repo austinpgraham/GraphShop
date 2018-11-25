@@ -21,7 +21,8 @@ setup(name='gs',
               'gs_upload_reviews=gs.dataserver.scripts.upload_reviews:main',
               'gs_up=gs.dataserver.scripts.gsup:main',
               'gs_filter=gs.dataserver.scripts.filter:main',
-              'gs_cr=gs.dataserver.scripts.recs:main'
+              'gs_cr=gs.dataserver.scripts.recs:main',
+              'gs_graph=gs.dataserver.scripts.graph:main'
           ]
       },
       install_requires=[
