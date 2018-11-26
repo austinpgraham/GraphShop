@@ -10,5 +10,6 @@ COPY . /src
 WORKDIR /src
 
 RUN pip3 install .
+RUN python3 -c 'import nltk; nltk.download("stopwords")'
 EXPOSE 80
 CMD gs_up -p 80
