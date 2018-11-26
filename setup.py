@@ -32,7 +32,9 @@ setup(name='gs',
           'psycopg2',
           'flask',
           'flask_cors',
-          'numpy'
+          'numpy',
+          'nltk',
+          'pandas'
       ],
       include_package_data=True
 )
