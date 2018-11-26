@@ -33,7 +33,8 @@ setup(name='gs',
           'flask',
           'flask_cors',
           'numpy',
-          'nltk'
+          'nltk',
+          'pandas'
       ],
       include_package_data=True
 )
