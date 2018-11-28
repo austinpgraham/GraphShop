@@ -30,15 +30,28 @@ def recs_for_user(uid):
     return Response(json.dumps(recs, skipkeys=True), mimetype='application/json')
 
 
+def _get_cluster_string_labels(clustering):
+    diffs = [c[0] - c[1] for c in clustering._centers]
+    max_dif = max(diffs)
+    positive_label = diffs.index(max_dif)
+    return ["bad", "good"] if positive_label == 0 else ["good", "bad"]
+
+
 @REVIEWS_ROUTE.route('/vis/<pid>', methods=['GET'])
 def get_vis(pid):
     reviews = get_reviews(pids=[pid])
+    if len(reviews) <= 0:
+        return Response(json.dumps([], skipkeys=True), mimetype='application/json')
     points = document_points(reviews)
     cluster = KMeans(DataFrame(points), 2)
     reviews = [r.__dict__ for r in reviews]
+    str_labels = _get_cluster_string_labels(cluster)
     for idx, r in enumerate(reviews):
         r.pop('_sa_instance_state')
-        r['cluster'] = cluster._clabels[idx]
+        label = cluster._clabels[idx]
+        if label > len(str_labels) - 1:
+            label = len(str_labels) - 1
+        r['cluster'] = str_labels[label]
     return Response(json.dumps(reviews, skipkeys=True), mimetype='application/json')
 
 
