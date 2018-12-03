@@ -26,6 +26,9 @@ from gs.dataserver.algorithms import GraphSVD
 
 
 class Review(Base):
+    """
+    ORM object representing a Review Entity
+    """
 
     __tablename__ = 'review'
 
@@ -46,12 +49,18 @@ class Review(Base):
             setattr(self, key, value)
     
     def convert_json(self):
+        """
+        Convert the object to JSON
+        """
         for att in self._JSON_ATTS:
             val = getattr(self, att, "[]") or "[]"
             setattr(self, att, json.loads(val))
 
 
 class Recommendation(Base):
+    """
+    ORM object for a Recommendation entity
+    """
 
     __tablename__ = "recommendation"
 
@@ -65,6 +74,10 @@ class Recommendation(Base):
 
 
 def reviewfunc(func, *args, **kwargs):
+    """
+    Check for the review table, create if
+    not present
+    """
     def wrapper(*args, **kwargs):
         with ModelDB() as db:
             if "review" not in db.inspector.get_table_names():
@@ -74,6 +87,9 @@ def reviewfunc(func, *args, **kwargs):
 
 
 def recommendationfunc(func, *args, **kwargs):
+    """
+    Check for recommendation table, create if not present
+    """
     def wrapper(*args, **kwargs):
         with ModelDB() as db:
             if "recommendation" not in db.inspector.get_table_names(): # pragma: no cover
@@ -83,6 +99,9 @@ def recommendationfunc(func, *args, **kwargs):
 
 @reviewfunc
 def add_reviews(objs, batch_size=50):
+    """
+    Add a set of reviews
+    """
     with ModelDB() as db:
         for b in _batch(objs, batch_size):
             db.session.bulk_save_objects(b)
@@ -90,6 +109,9 @@ def add_reviews(objs, batch_size=50):
 
 @reviewfunc
 def get_reviews(rids=None, pids=None):
+    """
+    Get all reveiws for the given pids and rids.
+    """
     with ModelDB() as db:
         query = db.session.query(Review)
         if rids is not None:
@@ -104,6 +126,9 @@ def get_reviews(rids=None, pids=None):
 
 @reviewfunc
 def review_exists(rid, pid):
+    """
+    Check if a review exists.
+    """
     with ModelDB() as db:
         query = db.session.query(Review).filter(Review.reviewerID == rid).filter(Review.asin == pid)
         ans = db.session.query(query.exists()).all().pop()[0]
@@ -112,6 +137,9 @@ def review_exists(rid, pid):
 
 @recommendationfunc
 def add_recommendations(objs, batch_size=50):
+    """
+    Add a set of recommendations.
+    """
     with ModelDB() as db:
         for b in _batch(objs, batch_size):
             db.session.bulk_save_objects(b)
@@ -119,6 +147,9 @@ def add_recommendations(objs, batch_size=50):
 
 @recommendationfunc
 def get_recommendations(uids=None):
+    """
+    Get recommendations for a given set of users.
+    """
     with ModelDB() as db:
         query = db.session.query(Recommendation)
         if uids is not None:
@@ -131,7 +162,11 @@ REC_LIMIT = 10000
 
 
 def compute_recommendations(components=3):
+    """
+    Compute the new recommendations.
+    """
     logging.info('Collecting data...')
+    # Get the users and corresponding and reviews
     users = get_user_set(REC_LIMIT)
     reviews = get_reviews(rids=users)
     pids = list(set([r.asin for r in reviews]))
@@ -141,25 +176,34 @@ def compute_recommendations(components=3):
     logging.info('Building matrix...')
     for u in users:
         mat.append([0 for _ in range(len(pids))])
+        # Get all relevant reviews
         user_reviews = [r for r in reviews if r.reviewerID == u]
         for r in user_reviews:
+            # Flip a coin, if heads save for testing
             if len(holdout) < 200 and random.randint(1, 2) == 1:
                 holdout.append((r.reviewerID, r.asin, r.overall / 5.0))
+            # insert values into matrix
             idx = pids.index(r.asin)
             mat[-1][idx] = r.overall / 5.0
     logging.info('Computing SVD...')
+    # Compute the SVD object
     recommender = GraphSVD(np.array(mat), components=components, epsilon=1e-6)
     logging.info('Getting test results...')
     correct = 0
+    # for every item held out, test against
+    # the predictions
     for _id, asin, score in holdout:
         idx = users.index(_id)
         pidx = pids.index(asin)
         predicted = recommender.predictions[idx][pidx]
         if abs(predicted - score) <= 0.2:
                 correct += 1
+    # Log success rate
     logging.info('Success rate: {}%.'.format((correct / 200)*100))
     logging.info('Uploading recommendations...')
+    # Upload all the recommendatinos
     for idx, u in enumerate(users):
+        # Sort based on likliehood
         recommended = sorted(zip(pids, recommender.predictions[idx]), key=operator.itemgetter(1), reverse=True)
         recommended = recommended[:5]
         items = [Recommendation(userID=u, asin=r[0], estimated_rating=r[1]) for r in recommended]

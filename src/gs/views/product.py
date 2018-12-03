@@ -12,6 +12,9 @@ PRODUCTS_ROUTE = Blueprint("products", __name__)
 
 @PRODUCTS_ROUTE.route('/<pid>', methods=['GET'])
 def get_product(pid):
+    """
+    Get a series of products
+    """
     pids = set(pid.split('&')) if '&' in pid else [pid]
     products = [p.__dict__ for p in get_products(pids)]
     for p in products:
@@ -21,6 +24,9 @@ def get_product(pid):
 
 @PRODUCTS_ROUTE.route('/search/<query>', methods=['GET'])
 def search_products(query):
+    """
+    Search the database with the given query
+    """
     query = query.replace('*', '%')
     products = [p.__dict__ for p in sp(query)]
     for p in products:

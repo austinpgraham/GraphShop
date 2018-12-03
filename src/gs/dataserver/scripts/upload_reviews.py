@@ -38,25 +38,34 @@ def process_args(args=None):
 
 
 def main(args=None):
+    """
+    Upload review objects from a file
+    """
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     _file = process_args(args=args)
     items = []
     total = 0
+    # For every item 
     for item in parse_file(_file):
         for key, value in item.items():
             item[key] = str(value)
+        # Create from dictionary
         r = Review(**item)
+        # If the user doesn't exist, add it
         if not user_exists(r.reviewerID):
             u = ReviewUser(id=r.reviewerID, name=getattr(r, "reviewerName", ""))
             add_reviewusers([u])
             logging.info("User {} added.".format(u.name))
+        # If the review doesn't exist, add it
         if not review_exists(r.reviewerID, r.asin) and product_exists(r.asin):
             items.append(r)
+        # Upload cached reviews
         if len(items) > 0 and len(items) % 50 == 0:
             add_reviews(items)
             total += 50
             logging.info("{} reviews uploaded.".format(total))
             items = []
+    # Upload the rest of the products
     add_reviews(items)
     logging.info("Done.")
 

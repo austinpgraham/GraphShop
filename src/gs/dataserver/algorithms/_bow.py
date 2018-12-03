@@ -3,17 +3,25 @@ import string
 
 from nltk.corpus import stopwords
 
-
+# Define constant for stop words
 FILLERS = set(stopwords.words('english'))
 MAX_RATING = 5
 
 
 def _filter_single(document):
+    """
+    Filter a single document from punctuation
+    and stop words
+    """
     translated = document.translate(str.maketrans("", "", string.punctuation)).lower()
     return [t for t in translated.split() if t not in FILLERS]
 
 
 def _make_weight_vector(documents):
+    """
+    Create the discrete word vector
+    from a series of documents
+    """
     words = []
     for d in documents:
         words.extend(d)
@@ -22,6 +30,11 @@ def _make_weight_vector(documents):
 
 
 def word_weights(documents):
+    """
+    Get a dictionary of positive and negative
+    weights for each word, including the vectorized
+    document series.
+    """
     doc_vectors = [_filter_single(d.summary) for d in documents]
     word_list = _make_weight_vector(doc_vectors)
     for idx, d in enumerate(documents):
@@ -32,6 +45,10 @@ def word_weights(documents):
 
 
 def document_points(documents):
+    """
+    Convert each document into a 2D point
+    with structure [positive, negative] 
+    """
     weights, vectors = word_weights(documents)
     points = []
     for idx, d in enumerate(documents):

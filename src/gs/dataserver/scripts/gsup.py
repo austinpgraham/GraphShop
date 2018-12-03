@@ -17,6 +17,9 @@ def process_args(args=None):
 
 
 def main(args=None):
+    """
+    Run the application
+    """
     host, port, debug = process_args(args)
     application.run(host=host, port=port, threaded=True, debug=debug)
 

@@ -7,6 +7,7 @@ from gs.views.product import register_products
 
 from gs.views.reviews import register_reviews
 
+# Create the application object
 application = Flask(__name__)
 CORS(application)
 register_products(application)

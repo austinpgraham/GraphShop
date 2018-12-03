@@ -16,6 +16,9 @@ REVIEWS_ROUTE = Blueprint("reviews", __name__)
 
 @REVIEWS_ROUTE.route('/<pid>', methods=['GET'])
 def reviews_for_product(pid):
+    """
+    Get reviews for a product
+    """
     reviews = [r.__dict__ for r in get_reviews(pids=[pid])]
     for r in reviews:
         r.pop('_sa_instance_state')
@@ -24,6 +27,9 @@ def reviews_for_product(pid):
 
 @REVIEWS_ROUTE.route('/recommendations/<uid>', methods=['GET'])
 def recs_for_user(uid):
+    """
+    Get the recommendations for a user
+    """
     recs = [r.__dict__ for r in get_recommendations(uids=[uid])]
     for r in recs:
         r.pop('_sa_instance_state')
@@ -31,6 +37,9 @@ def recs_for_user(uid):
 
 
 def _get_cluster_string_labels(clustering):
+    """
+    Get the labels for online clustering
+    """
     diffs = [c[0] - c[1] for c in clustering._centers]
     max_dif = max(diffs)
     positive_label = diffs.index(max_dif)
@@ -39,12 +48,19 @@ def _get_cluster_string_labels(clustering):
 
 @REVIEWS_ROUTE.route('/vis/<pid>', methods=['GET'])
 def get_vis(pid):
+    """
+    Return the clusters for the visualization
+    """
+    # Get the reviews
     reviews = get_reviews(pids=[pid])
     if len(reviews) <= 0:
         return Response(json.dumps([], skipkeys=True), mimetype='application/json')
+    # Turn the documents to points
     points = document_points(reviews)
+    # Cluster the points
     cluster = KMeans(DataFrame(points), 2)
     reviews = [r.__dict__ for r in reviews]
+    # Label and return the objects.
     str_labels = _get_cluster_string_labels(cluster)
     for idx, r in enumerate(reviews):
         r.pop('_sa_instance_state')

@@ -11,6 +11,9 @@ def process_args(args=None):
 
 
 def main(args=None):
+    """
+    Trigger a computation of recommendations
+    """
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logging.info('Beginning recommendation compute...')
     compute_recommendations(components=140)
