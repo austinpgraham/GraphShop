@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import random
 import logging
 import operator
 import numpy as np
@@ -128,21 +129,35 @@ def get_recommendations(uids=None):
 
 REC_LIMIT = 10000
 
+
 def compute_recommendations(components=3):
     logging.info('Collecting data...')
     users = get_user_set(REC_LIMIT)
     reviews = get_reviews(rids=users)
     pids = list(set([r.asin for r in reviews]))
+    logging.info("A total of {} users and {} products are being used.".format(len(users), len(pids)))
     mat = []
+    holdout = []
     logging.info('Building matrix...')
     for u in users:
         mat.append([0 for _ in range(len(pids))])
         user_reviews = [r for r in reviews if r.reviewerID == u]
         for r in user_reviews:
+            if len(holdout) < 200 and random.randint(1, 2) == 1:
+                holdout.append((r.reviewerID, r.asin, r.overall / 5.0))
             idx = pids.index(r.asin)
             mat[-1][idx] = r.overall / 5.0
     logging.info('Computing SVD...')
     recommender = GraphSVD(np.array(mat), components=components, epsilon=1e-6)
+    logging.info('Getting test results...')
+    correct = 0
+    for _id, asin, score in holdout:
+        idx = users.index(_id)
+        pidx = pids.index(asin)
+        predicted = recommender.predictions[idx][pidx]
+        if abs(predicted - score) <= 0.2:
+                correct += 1
+    logging.info('Success rate: {}%.'.format((correct / 200)*100))
     logging.info('Uploading recommendations...')
     for idx, u in enumerate(users):
         recommended = sorted(zip(pids, recommender.predictions[idx]), key=operator.itemgetter(1), reverse=True)
