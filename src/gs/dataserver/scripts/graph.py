@@ -4,7 +4,7 @@ import json
 
 from gs.dataserver.algorithms import ProductGraph
 
-START_ASIN = '048640871X'
+START_ASIN = '0000589012'
 
 def main():
     graph = ProductGraph(START_ASIN)
